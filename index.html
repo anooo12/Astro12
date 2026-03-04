@@ -274,38 +274,12 @@ Jawaban kamu singkat, jelas, dan helpful.`;
 
     let history = [];
     let loading = false;
-    let apiKey = "";
+    const apiKey = "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";
 
-    // Init
-    window.onload = () => {
-      const saved = localStorage.getItem("astro_key");
-      if (saved) { apiKey = saved; showChat(); }
-      else showSetup();
-    };
+    window.onload = () => showChat();
 
-    function saveKey() {
-      const val = document.getElementById("api-key-input").value.trim();
-      if (!val.startsWith("gsk_")) {
-        alert("API Key tidak valid. Harus dimulai dengan gsk_...");
-        return;
-      }
-      apiKey = val;
-      localStorage.setItem("astro_key", val);
-      showChat();
-    }
-
-    function logout() {
-      localStorage.removeItem("astro_key");
-      apiKey = "";
-      history = [];
-      document.getElementById("messages").innerHTML = "";
-      showSetup();
-    }
-
-    function showSetup() {
-      document.getElementById("setup").style.display = "flex";
-      document.getElementById("app").style.display = "none";
-    }
+    function logout() {}
+    function showSetup() {}
 
     function showChat() {
       document.getElementById("setup").style.display = "none";
@@ -313,7 +287,6 @@ Jawaban kamu singkat, jelas, dan helpful.`;
       if (history.length === 0) {
         addMessage("assistant", "Halo! Aku Ano 👋 Mau tanya apa?");
       }
-      document.getElementById("input").focus();
     }
 
     // Auto resize textarea
