@@ -79,7 +79,7 @@
       <span class="brand-icon">✨</span>
       <div class="brand-text">
         <h1 id="model-name">Astro 1.2</h1>
-        <small id="model-sub">powered by Ano · LLaMA</small>
+        <small id="model-sub">powered by Ano · Claude</small>
       </div>
     </div>
     <div class="model-switch">
@@ -161,7 +161,7 @@ function switchModel(m) {
   document.getElementById('btn-12').classList.toggle('active', m==='12');
   document.getElementById('btn-20').classList.toggle('active', m==='20');
   document.getElementById('model-name').textContent = m==='12' ? 'Astro 1.2' : 'Astro 2.0';
-  document.getElementById('model-sub').textContent = m==='12' ? 'powered by Ano · LLaMA' : 'powered by Ano · Claude';
+  document.getElementById('model-sub').textContent = m==='12' ? 'powered by Ano · Claude' : 'powered by Ano · Claude';
 }
 
 function newChat() {
@@ -304,35 +304,22 @@ async function sendMessage() {
     }
     msgs.push({role:'user', content: text || 'Halo'});
 
-    var res;
-    if (currentModel === '20') {
-      res = await fetch(CLAUDE_PROXY, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 2048,
-          system: SYSTEM_20,
-          messages: msgs.slice(1)
-        })
-      });
-    } else {
-      res = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-        body: JSON.stringify({model:'llama-3.3-70b-versatile', max_tokens:2048, messages:msgs})
-      });
-    }
+    var sysPrompt = currentModel === '20' ? SYSTEM_20 : SYSTEM_12;
+    var res = await fetch(CLAUDE_PROXY, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2048,
+        system: sysPrompt,
+        messages: msgs.slice(1)
+      })
+    });
 
     if (!res.ok) throw new Error('HTTP '+res.status);
     var data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    var reply;
-    if (currentModel === '20') {
-      reply = data.content && data.content[0] && data.content[0].text;
-    } else {
-      reply = data.choices && data.choices[0] && data.choices[0].message.content;
-    }
+    var reply = data.content && data.content[0] && data.content[0].text;
 
     history.push({role:'assistant', content: reply});
 
